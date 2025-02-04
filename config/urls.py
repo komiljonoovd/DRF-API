@@ -24,7 +24,7 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="DRF APIs",
+        title="DRF API",
         default_version='v1',
         description="Test description",
         terms_of_service="",

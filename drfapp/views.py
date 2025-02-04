@@ -175,31 +175,53 @@ class ParentDeletedView(APIView):
 
 
 class PupilsNotLinkedView(APIView):
-    def get(self,request):
+    def get(self, request):
         pupil = Pupils.objects.filter(classes__isnull=True).order_by('first_name')
         if not pupil.exists():
-            return Response({'pupils':'NOT FOUND'},
+            return Response({'pupils': 'NOT FOUND'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PupilSerializer(pupil,many=True)
+        serializer = PupilSerializer(pupil, many=True)
         return Response({
-            'count':len(serializer.data),
-            'result':serializer.data
+            'count': len(serializer.data),
+            'result': serializer.data
         })
 
 
 class PupilsLinkedView(APIView):
-    def get(self,request):
+    def get(self, request):
         pupil = Pupils.objects.filter(classes__isnull=False).order_by('first_name')
         if not pupil.exists():
-            return Response({'pupils':'NOT FOUND'},
+            return Response({'pupils': 'NOT FOUND'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PupilSerializer(pupil,many=True)
+        serializer = PupilSerializer(pupil, many=True)
         return Response({
-            'count':len(serializer.data),
-            'result':serializer.data
+            'count': len(serializer.data),
+            'result': serializer.data
         })
 
 
+class PupilIDView(APIView):
+    def get(self, request, pk):
+        pupil = Pupils.objects.filter(pk=pk)
+        if not pupil.exists():
+            return Response({'pupil': 'NOT FOUND'},
+                            status=status.HTTP_404_NOT_FOUND)
 
+        serializer = PupilSerializer(pupil, many=True)
+        return Response({
+            'pupil': serializer.data
+        })
+
+
+class TeacherIDView(APIView):
+    def get(self, request, pk):
+        teacher = Teachers.objects.filter(pk=pk)
+        if not teacher.exists():
+            return Response(
+                {'teacher': 'NOT FOUND'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = TeachersSerializer(teacher, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
