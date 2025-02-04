@@ -1,0 +1,105 @@
+from django.db import models
+
+
+class Classes(models.Model):
+    number = models.IntegerField()
+    letter = models.CharField(max_length=1)
+    isactive = models.BooleanField(default=True)
+    teacher = models.ForeignKey('Teachers', on_delete=models.SET_NULL, blank=True, null=True,related_name='classes')
+    createdon = models.DateTimeField(auto_now_add=True)
+    modifiedon = models.DateTimeField(auto_now=True)
+    createdby = models.CharField(max_length=128)
+    modifiedby = models.CharField(max_length=128, blank=True)
+    isdeleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.number}-{self.letter}'
+
+    class Meta:
+
+
+        db_table = 'Classes'
+        verbose_name = 'Classes'
+        verbose_name_plural = 'Classes'
+
+
+class Parents(models.Model):
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    surname = models.CharField(max_length=128, blank=True)
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    createdon = models.DateTimeField(auto_now_add=True)
+    modifiedon = models.DateTimeField(auto_now=True)
+    createdby = models.CharField(max_length=128)
+    modifiedby = models.CharField(max_length=128, blank=True)
+    isdeleted = models.BooleanField()
+    note = models.TextField(blank=True)
+
+    def __str__(self):
+        return ' '.join(filter(None, [self.first_name, self.last_name, self.surname]))
+
+    class Meta:
+        db_table = 'Parents'
+        verbose_name = 'Parents'
+        verbose_name_plural = 'Parents'
+
+
+class Pupils(models.Model):
+    GENDER_CHOICES = [
+        ('Мальчик', 'Мальчик'),
+        ('Девочка', 'Девочка'),
+    ]
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    surname = models.CharField(max_length=128, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    birthday = models.DateField()
+    classes = models.ForeignKey('Classes', on_delete=models.SET_NULL, null=True, related_name='pupil')
+    createdon = models.DateTimeField(auto_now_add=True)
+    modifiedon = models.DateTimeField(auto_now=True)
+    createdby = models.CharField(max_length=128)
+    modifiedby = models.CharField(max_length=128, blank=True)
+    isdeleted = models.BooleanField(default=False)
+    note = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        db_table = 'Pupils'
+        verbose_name = 'Pupils'
+        verbose_name_plural = 'Pupils'
+
+
+class ParentPupil(models.Model):
+    parent = models.ForeignKey(Parents, on_delete=models.CASCADE, null=True, verbose_name='Parent',related_name='pupil_relations')
+    pupil = models.ForeignKey(Pupils, on_delete=models.CASCADE, null=True, verbose_name='Child')
+
+    def __str__(self):
+        return (f'Parent: {self.parent}'
+                f'Child: {self.pupil}')
+
+    class Meta:
+        unique_together = ('parent', 'pupil')
+        db_table = 'Parents And Pupils'
+        verbose_name = 'Parents And Pupils'
+        verbose_name_plural = 'Parents And Pupils'
+
+
+class Teachers(models.Model):
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    surname = models.CharField(max_length=128, blank=True)
+    createdon = models.DateTimeField(auto_now_add=True)
+    modifiedon = models.DateTimeField(auto_now=True)
+    createdby = models.CharField(max_length=128)
+    modifiedby = models.CharField(max_length=128, blank=True)
+    isdeleted = models.BooleanField(max_length=128)
+
+    def __str__(self):
+        return ' '.join(filter(None, [self.first_name, self.last_name, self.surname]))
+
+    class Meta:
+        db_table = 'Teachers'
+        verbose_name = 'Teachers'
+        verbose_name_plural = 'Teachers'
