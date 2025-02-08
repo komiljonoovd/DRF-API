@@ -4,7 +4,6 @@ from . import views
 
 urlpatterns = [
     path('Classes/', views.ClassCreateView.as_view(), name='class-create-view'),
-    path('Classes/Delete/<int:pk>/', views.ClassDeleteView.as_view(), name='class-delete-view'),
     path('Classes/Edit/<int:pk>/', views.ClassEditView.as_view(), name='class-edit-view'),
     path('Classes/active/', views.ClassViewTrue.as_view(), name='class-view-true'),
     path('Classes/not-active/', views.ClassViewFalse.as_view(), name='claass-view-false'),
@@ -34,5 +33,6 @@ urlpatterns = [
     path('Pupils/Not/Deleted/', views.PupilNotDeletedView.as_view(), name='pupils-deleted-view'),
     path('Pupils/not-linked-to-class/', views.PupilsNotLinkedView.as_view(), name='not-linked-view'),
     path('Pupils/linked-to-class/', views.PupilsLinkedView.as_view(), name='linked-view'),
+
 
 ]
