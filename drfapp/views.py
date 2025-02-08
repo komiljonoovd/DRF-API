@@ -386,3 +386,11 @@ class TeacherEditView(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save(modifiedby=self.request.user.username)
+
+
+class ClassDeleteView(APIView):
+    def delete(self,request,pk):
+        delete = Classes.objects.filter(pk=pk).delete()
+        if delete:
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
