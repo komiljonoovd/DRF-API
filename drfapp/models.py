@@ -32,7 +32,7 @@ class Parents(models.Model):
     modifiedon = models.DateTimeField(auto_now=True)
     createdby = models.CharField(max_length=128)
     modifiedby = models.CharField(max_length=128, blank=True)
-    isdeleted = models.BooleanField()
+    isdeleted = models.BooleanField(default=False)
     note = models.TextField(blank=True)
 
     def __str__(self):
@@ -94,7 +94,7 @@ class Teachers(models.Model):
     modifiedon = models.DateTimeField(auto_now=True)
     createdby = models.CharField(max_length=128)
     modifiedby = models.CharField(max_length=128, blank=True)
-    isdeleted = models.BooleanField(max_length=128)
+    isdeleted = models.BooleanField(default=False)
 
     def __str__(self):
         return ' '.join(filter(None, [self.first_name, self.last_name, self.surname]))

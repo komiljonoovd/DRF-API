@@ -1,12 +1,14 @@
 from django.shortcuts import render
-
+from rest_framework.viewsets import ModelViewSet
 from .models import Classes, Pupils, Teachers, Parents
 # Create your views here.
 from .serializers import ClassSerializer, ClassPupilSerializer, MalePupilsSerializer, TeachersClassesSerializer, \
-    PupilDeletedSerializer, TeachersSerializer, ParentSerializer, PupilSerializer
-from rest_framework import generics
+    PupilDeletedSerializer, TeachersSerializer, ParentSerializer, PupilSerializer, PupilInfoSerializer, \
+    UpdateSerializer, ClassCreateSerializer, ParentCreateSerializer, TeachersCreateSerializer, PupilsCreateSerializer, \
+    ClassPUTSerializer
+from rest_framework import generics, viewsets, mixins, permissions
 from rest_framework import status
-
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -209,7 +211,7 @@ class PupilIDView(APIView):
             return Response({'pupil': 'NOT FOUND'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PupilSerializer(pupil, many=True)
+        serializer = PupilInfoSerializer(pupil, many=True)
         return Response({
             'pupil': serializer.data
         })
@@ -225,3 +227,139 @@ class TeacherIDView(APIView):
             )
         serializer = TeachersSerializer(teacher, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ParentsNotDeletedView(generics.ListAPIView):
+    queryset = Parents.objects.filter(isdeleted=False).order_by('-first_name')
+    serializer_class = ParentSerializer
+
+
+class TeacherByIdViewSets(viewsets.ReadOnlyModelViewSet):
+    queryset = Pupils.objects.all()
+    serializer_class = PupilInfoSerializer
+
+
+# class TeachersDeleteView(APIView):
+#     def post(self, request):
+#         print('post request')
+#         print(request.data)
+#         # Передаем данные из запроса в сериализатор
+#         serializer = UpdateSerializer(data=request.data)
+#
+#         # Проверяем, если данные валидны
+#         if serializer.is_valid():
+#             ids = serializer.validated_data['ids']
+#             # Обновляем преподавателей по переданным ID
+#             update_count = Teachers.objects.filter(id__in=ids).update(isdeleted=True)
+#
+#             # Ответ с количеством обновленных преподавателей
+#             return Response({'message': f'{update_count} teachers updated successfully.'}, status=status.HTTP_200_OK)
+#
+#         # Если данные не валидны, возвращаем ошибку
+#         print(serializer.errors)  # Лог ошибок
+#
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClassCreateView(generics.CreateAPIView):
+    queryset = Classes.objects.all()
+    serializer_class = ClassCreateSerializer
+
+    # permission_classes = [permissions.AllowAny]
+
+    def perform_create(self, serializer):
+        number = serializer.validated_data['number']
+        letter = serializer.validated_data['letter']
+
+        if Classes.objects.filter(number=number, letter=letter, isactive=True).exists():
+            raise ValidationError({"error": f"Класс {number}-{letter} уже существует ! "})
+        if number > 11 or number < 1:
+            raise ValidationError({"error": "Классы существуют с 1-го до 11-го  класса !"})
+
+        serializer.save(createdby=self.request.user)
+
+
+class ParentCreateView(generics.CreateAPIView):
+    queryset = Parents.objects.all()
+    serializer_class = ParentCreateSerializer
+
+
+class TeachersCreateView(generics.CreateAPIView):
+    queryset = Teachers.objects.all()
+    serializer_class = TeachersCreateSerializer
+
+
+class PupilCreateView(generics.CreateAPIView):
+    queryset = Pupils.objects.all()
+    serializer_class = PupilsCreateSerializer
+
+
+class ClassDeleteView(generics.UpdateAPIView):
+    queryset = Classes.objects.all()
+    http_method_names = ['patch']
+
+    def patch(self, request, pk):
+        update = Classes.objects.filter(pk=pk).update(isdeleted=True)
+        if update:
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class ParentDeleteView(generics.UpdateAPIView):
+    queryset = Parents.objects.all()
+    http_method_names = ['patch']
+
+    def patch(self, request, pk):
+        update = Parents.objects.filter(pk=pk).update(isdeleted=True)
+        if update:
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class TeacherstDeleteView(generics.UpdateAPIView):
+    queryset = Teachers.objects.all()
+    http_method_names = ['patch']
+
+    def patch(self, request, pk):
+        update = Teachers.objects.filter(pk=pk).update(isdeleted=True)
+        if update:
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class PupilDeleteView(generics.UpdateAPIView):
+    queryset = Pupils.objects.all()
+    http_method_names = ['patch']
+
+    def patch(self, request, pk):
+        update = Pupils.objects.filter(pk=pk).update(isdeleted=True)
+        if update:
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class ClassEditView(generics.UpdateAPIView):
+    queryset = Classes.objects.all()
+    serializer_class = ClassPUTSerializer
+    http_method_names = ['put']
+
+    def put(self, request, pk):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid():
+            number = serializer.validated_data.get('number')
+            letter = serializer.validated_data.get('letter')
+
+            if Classes.objects.filter(number=number, letter=letter, isactive=True).exclude(pk=pk).exists():
+                return Response(
+                    {"error": f"Класс {number}-{letter} уже существует!"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer.save(modifiedby=request.user.username)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        serializer.save(modifiedby=self.request.user.username)
