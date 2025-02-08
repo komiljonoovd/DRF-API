@@ -5,7 +5,7 @@ from .models import Classes, Pupils, Teachers, Parents
 from .serializers import ClassSerializer, ClassPupilSerializer, MalePupilsSerializer, TeachersClassesSerializer, \
     PupilDeletedSerializer, TeachersSerializer, ParentSerializer, PupilSerializer, PupilInfoSerializer, \
     UpdateSerializer, ClassCreateSerializer, ParentCreateSerializer, TeachersCreateSerializer, PupilsCreateSerializer, \
-    ClassPUTSerializer
+    ClassPUTSerializer, ParentsPUTSerializer, PupilsPUTSerializer, TeacherPUTSeriazlier
 from rest_framework import generics, viewsets, mixins, permissions
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -294,8 +294,7 @@ class PupilCreateView(generics.CreateAPIView):
     serializer_class = PupilsCreateSerializer
 
 
-class ClassDeleteView(generics.UpdateAPIView):
-    queryset = Classes.objects.all()
+class ClassDeleteView(APIView):
     http_method_names = ['patch']
 
     def patch(self, request, pk):
@@ -305,8 +304,7 @@ class ClassDeleteView(generics.UpdateAPIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class ParentDeleteView(generics.UpdateAPIView):
-    queryset = Parents.objects.all()
+class ParentDeleteView(APIView):
     http_method_names = ['patch']
 
     def patch(self, request, pk):
@@ -316,8 +314,7 @@ class ParentDeleteView(generics.UpdateAPIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class TeacherstDeleteView(generics.UpdateAPIView):
-    queryset = Teachers.objects.all()
+class TeacherstDeleteView(APIView):
     http_method_names = ['patch']
 
     def patch(self, request, pk):
@@ -327,8 +324,7 @@ class TeacherstDeleteView(generics.UpdateAPIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class PupilDeleteView(generics.UpdateAPIView):
-    queryset = Pupils.objects.all()
+class PupilDeleteView(APIView):
     http_method_names = ['patch']
 
     def patch(self, request, pk):
@@ -360,6 +356,33 @@ class ClassEditView(generics.UpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        serializer.save(modifiedby=self.request.user.username)
+
+
+class ParentEditView(generics.UpdateAPIView):
+    queryset = Parents.objects.all()
+    serializer_class = ParentsPUTSerializer
+    http_method_names = ['put']
+
+    def perform_update(self, serializer):
+        serializer.save(modifiedby=self.request.user.username)
+
+
+class PupilEditView(generics.UpdateAPIView):
+    queryset = Pupils.objects.all()
+    serializer_class = PupilsPUTSerializer
+    http_method_names = ['put']
+
+    def perform_update(self, serializer):
+        serializer.save(modifiedby=self.request.user.username)
+
+
+class TeacherEditView(generics.UpdateAPIView):
+    queryset = Teachers.objects.all()
+    serializer_class = TeacherPUTSeriazlier
+    http_method_names = ['put']
 
     def perform_update(self, serializer):
         serializer.save(modifiedby=self.request.user.username)

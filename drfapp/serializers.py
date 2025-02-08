@@ -151,3 +151,29 @@ class ClassPUTSerializer(serializers.ModelSerializer):
     class Meta:
         model = Classes
         fields = ['number', 'letter', 'isactive', 'teacher', 'isdeleted', 'modifiedby']
+
+
+class ParentsPUTSerializer(serializers.ModelSerializer):
+    modifiedby = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Parents
+        fields = ['first_name', 'last_name', 'surname', 'phone', 'isdeleted', 'note', 'modifiedby']
+
+
+class PupilsPUTSerializer(serializers.ModelSerializer):
+    modifiedby = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Pupils
+        fields = ['first_name', 'last_name', 'surname', 'gender','birthday','classes','isdeleted', 'note', 'modifiedby']
+
+
+class TeacherPUTSeriazlier(serializers.ModelSerializer):
+    modifiedby = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Teachers
+        fields = ['first_name', 'last_name', 'surname', 'isdeleted', 'modifiedby']
+
+
