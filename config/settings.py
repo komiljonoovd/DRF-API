@@ -43,10 +43,59 @@ INSTALLED_APPS = [
     'django_extensions',
 
 ]
+
+# settings.py
+
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
-    ]
+    ],
+
+    'DATE_FORMAT': "%Y-%m-%d",
+    'DATETIME_FORMAT': "%Y-%m-%dT%H:%M:%S",
+
+    'DEFAULT_STATUS_CODE': 200,
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+
+
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ],
+
+    'ORDERING_PARAM': 'ordering',
+
+    'DEFAULT_SERIALIZER_CLASSES': [
+        'rest_framework.serializers.ModelSerializer',
+        'rest_framework.serializers.Serializer',
+    ],
+}
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'BearerAuth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'Enter your JWT token as `Bearer <token>`',
+        },
+    },
 }
 
 
