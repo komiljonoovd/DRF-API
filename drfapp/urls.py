@@ -2,13 +2,7 @@ from django.urls import path, include
 
 from . import views
 
-from rest_framework.routers import DefaultRouter
-
-router = DefaultRouter()
-router.register(r'pupils', views.TeacherByIdViewSets, basename='pupil')
-
 urlpatterns = [
-    path('', include(router.urls)),  # Включаем роутер в пути
     path('Classes/', views.ClassCreateView.as_view(), name='class-create-view'),
     path('Classes/Delete/<int:pk>/', views.ClassDeleteView.as_view(), name='class-delete-view'),
     path('Classes/Edit/<int:pk>/', views.ClassEditView.as_view(), name='class-edit-view'),
@@ -17,7 +11,7 @@ urlpatterns = [
     path('Classes/include/Pupils/', views.ClassPupilView.as_view(), name='class-pupil-view'),
 
     path('Teachers/', views.TeachersCreateView.as_view(), name='teachers-create-view'),
-    path('Teachers/Edit/<int:pk>/',views.TeacherEditView.as_view(),name='teacher-edit-view'),
+    path('Teachers/Edit/<int:pk>/', views.TeacherEditView.as_view(), name='teacher-edit-view'),
     path('Teachers/Delete/<int:pk>/', views.TeacherstDeleteView.as_view(), name='teachers-delete-view'),
     path('Teachers/<int:pk>/', views.TeacherIDView.as_view(), name='teacher-id-view'),
     path('Teachers/Classes/', views.TeachersClassesView.as_view(), name='teacher-classes-view'),
@@ -32,7 +26,7 @@ urlpatterns = [
 
     path('Pupils/', views.PupilCreateView.as_view(), name='pupil-create-view'),
     path('Pupils/Delete/<int:pk>/', views.PupilDeleteView.as_view(), name='pupil-delete-view'),
-    path('Pupils/Edit/<int:pk>/',views.PupilEditView.as_view(),name='pupil-edit-view'),
+    path('Pupils/Edit/<int:pk>/', views.PupilEditView.as_view(), name='pupil-edit-view'),
     path('Pupils/male/', views.MalePupilsView.as_view(), name='male-pupils-view'),
     path('Pupils/female/', views.FemalePupilsView.as_view(), name='male-pupils-view'),
     path('Pupils/<int:pk>/', views.PupilIDView.as_view(), name='pupil-id-view'),
